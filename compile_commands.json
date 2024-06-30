@@ -1,0 +1,8 @@
+[
+    {
+        "directory": "C:\\Users\\abods\\OneDrive\\Documents\\Development\\C++\\raylib-test",
+        "command": "C:\\Users\\abods\\AppData\\Local\\nvim-data\\mason\\packages\\clangd\\clangd_17.0.3\\bin\\clang++ -IC:\\raylib\\raylib\\src -o main *.cpp",
+        "file": "C:\\Users\\abods\\OneDrive\\Documents\\Development\\C++\\raylib-test\\src\\main.cpp"
+    }
+]
+
