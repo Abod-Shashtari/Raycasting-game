@@ -3,8 +3,10 @@
 int main(void)
 {
     // Initialization
-    const int screenWidth = 1024;
-    const int screenHeight = 512;
+    //const int screenWidth = 1024;
+    //const int screenHeight = 512;
+    const int screenWidth = 960;
+    const int screenHeight = 640;
     Game *game=new Game();
     game->init((char *)"RAYCAST", screenWidth, screenHeight);
 
@@ -15,6 +17,10 @@ int main(void)
     {
         game->update();
         game->render();
+        /*
+        int currentFPS = GetFPS();
+        std::cout<<currentFPS<<std::endl;
+        */
     }
 
     CloseWindow();        // Close window and OpenGL context

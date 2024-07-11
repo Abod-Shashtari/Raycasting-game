@@ -1,6 +1,7 @@
 #pragma once
 #include "Map.hpp"
 #include "Player.hpp"
+#include <vector>
 
 #ifndef PI
 #define PI 3.1415926535
@@ -19,8 +20,11 @@
 #endif
 
 class Raycast{
+    private:
+        float distances[120];
     public:
         void drawRays3D(Player& player, Map& map);
+        void drawSprite(Player& player, std::vector<GameObject> enemmies);
         float horizontalIntersection(Player& player,Map& map, int mx,int my,int mp,int dof,float rx,float ry,float ra,float xo,float yo, float& hx,float& hy, int& textureTypeH);
         float verticalIntersection(Player& player, Map& map, int mx,int my,int mp,int dof,float rx,float ry,float ra,float xo,float yo, float& vx,float& vy, int& textureTypeV);
 };

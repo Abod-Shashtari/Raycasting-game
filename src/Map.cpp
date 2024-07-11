@@ -13,7 +13,7 @@ Map::Map(){
         2,2,2,1,1,1,1,1,
         2,0,1,0,0,0,0,1,
         2,0,5,0,0,0,0,1,
-        2,0,1,1,0,0,0,1,
+        2,0,1,0,0,0,0,1,
         1,0,5,0,0,0,0,1,
         1,0,1,1,0,1,0,1,
         1,0,0,0,0,0,0,1,
@@ -32,10 +32,11 @@ void Map::render(){
         for (int x=0; x<mapX; ++x) {
             if(map[x+(y*mapX)]>=1){
                 mapColor=BLUE;
+                DrawRectangle(x*mapSize+1+Game::miniMapOffset, y*mapSize+1+Game::miniMapOffset, mapSize-1, mapSize-1, mapColor);
             }else{
                 mapColor=BLACK;
+                DrawRectangleLines(x*mapSize+1+Game::miniMapOffset, y*mapSize+1+Game::miniMapOffset, mapSize-1, mapSize-1, mapColor);
             }
-            DrawRectangle(x*mapSize+1+Game::miniMapOffset, y*mapSize+1+Game::miniMapOffset, mapSize-1, mapSize-1, mapColor);
         }
     
     }
@@ -49,5 +50,8 @@ int Map::getMapX(){
 }
 int Map::getMapY(){
     return mapY;
+}
+int Map::getMapSize(){
+    return 64;
 }
 

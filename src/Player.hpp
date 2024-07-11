@@ -2,6 +2,8 @@
 #include "Vector2D.hpp"
 #include "DeltaAngle.hpp"
 #include "Map.hpp"
+#include "GameObject.hpp"
+#include <vector>
 
 class Player{
     private:
@@ -12,7 +14,7 @@ class Player{
     public:
         Player(float x, float y,int speed);
         ~Player();
-        void update(Map& map);
+        void update(Map& map,std::vector<GameObject> &enemies);
         void render(Map& map);
         Vector2D* getPos();
         DeltaAngle* getDeltaAngle();

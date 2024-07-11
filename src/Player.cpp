@@ -2,6 +2,8 @@
 #include "Game.hpp"
 #include "raylib.h"
 #include <cmath>
+#include <iostream>
+#include <vector>
 
 int dir[4]={0};
 int doorDir[4]={0};
@@ -55,7 +57,7 @@ void collide(Vector2D& pos, DeltaAngle& deltaAngle, Map& map, int offset, int di
     }
 
 }
-void Player::update(Map& map){
+void Player::update(Map& map,std::vector<GameObject> &enemies){
     if(IsKeyDown(KEY_W)){
         dir[0]={0};dir[1]={0};dir[2]={0};dir[3]={0};
         collide(*pos, *deltaAngle, map, 10, dir);
@@ -97,6 +99,26 @@ void Player::update(Map& map){
             if(doorDir[i]!=-1)
                 //open the door
                 map.getMap()[doorDir[i]]=0;
+        }
+    }
+    //shoot
+    if(IsKeyPressed(KEY_LEFT_CONTROL)){
+        float playerDeg=(this->getDeltaAngle()->angle)*RAD2DEG;
+        int index=0;
+        for(GameObject e : enemies){
+            //enemy angle
+            float vx=e.x-this->getPos()->getPosX();
+            float vy=e.y-this->getPos()->getPosY();
+            float enemyAngle=atan2(vy,vx)*RAD2DEG;
+            if(enemyAngle>360)enemyAngle-=360;
+            if(enemyAngle<0)enemyAngle+=360;
+
+            if(abs(playerDeg-enemyAngle)<=10) {
+                std::cout<<"KILLED"<<std::endl;
+                enemies.erase(enemies.begin()+index);
+                break;
+            }
+            ++index;
         }
     }
 }
