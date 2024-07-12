@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include "../assets/playerText.ppm"
 
 int dir[4]={0};
 int doorDir[4]={0};
@@ -13,6 +14,8 @@ Player::Player(float x, float y,int speed){
     pdx=cos(pa)*speed;
     pdy=sin(pa)*speed;
     deltaAngle= new DeltaAngle(pdx,pdy,pa);
+    InitAudioDevice();
+    gunShotWav=LoadSound("../assets/gunshot.wav");
 }
 Player::~Player(){
 }
@@ -103,6 +106,7 @@ void Player::update(Map& map,std::vector<GameObject> &enemies){
     }
     //shoot
     if(IsKeyPressed(KEY_LEFT_CONTROL)){
+        PlaySound(gunShotWav);
         float playerDeg=(this->getDeltaAngle()->angle)*RAD2DEG;
         int index=0;
         for(GameObject e : enemies){
@@ -113,7 +117,7 @@ void Player::update(Map& map,std::vector<GameObject> &enemies){
             if(enemyAngle>360)enemyAngle-=360;
             if(enemyAngle<0)enemyAngle+=360;
 
-            if(abs(playerDeg-enemyAngle)<=10) {
+            if(abs(playerDeg-enemyAngle)<=15) {
                 std::cout<<"KILLED"<<std::endl;
                 enemies.erase(enemies.begin()+index);
                 break;
@@ -128,10 +132,30 @@ Vector2D* Player::getPos(){
 DeltaAngle* Player::getDeltaAngle(){
     return deltaAngle;
 }
+void drawHand(){
+    int offsetX=540;
+    int offsetY=330;
+    int reslution=2;
+    for(int i=0;i<325;i+=reslution){
+        for(int j=0;j<366;j+=reslution){
+                int pixel = (i*366+j)*3;
+                int red = playerText[pixel];
+                int green = playerText[pixel + 1];
+                int blue = playerText[pixel + 2];
+
+                int alpha =(red==255 && green ==255 && blue==255)?0:255;
+                Color color={static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),static_cast<unsigned char>(alpha)};
+                Vector2 v1={static_cast<float>(j+offsetX),static_cast<float>(i+offsetY)};
+                Vector2 v2={static_cast<float>(j+offsetX),static_cast<float>(i+offsetY+reslution)};
+                DrawLineEx(v1, v2, reslution, color);
+        }
+    }
+}
 void Player::render(Map& map){
     int width=4;
     int height=4;
     DrawLine(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset, (pos->getPosX()+deltaAngle->dx)*Game::miniMapScale+Game::miniMapOffset,(pos->getPosY()+deltaAngle->dy)*Game::miniMapScale+Game::miniMapOffset, RED);
     DrawRectangle(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset, width, height, RED); 
+    drawHand();
 }
 
