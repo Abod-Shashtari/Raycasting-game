@@ -5,7 +5,7 @@
 
 #include "../assets/textures.ppm"
 #include "../assets/alien.ppm"
-#include "Constants.cpp"
+#include "Constants.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -50,7 +50,7 @@ float Raycast::verticalIntersection(Player& player,Map& map,int mx,int my,int mp
             mx=(int)rx>>6;
             my=(int)ry>>6;
             mp=my*map.getMapX()+mx;
-            if((mp>=0 && mp<64) && (map.getMap()[mp]>=1)){
+            if((mp>=0 && mp<map.getMapSize()) && (map.getMap()[mp]>=1)){
                 dof=8;
                 vx=rx;
                 vy=ry;
@@ -88,7 +88,7 @@ float Raycast::horizontalIntersection(Player& player, Map& map, int mx,int my,in
             mx=(int)rx>>6;
             my=(int)ry>>6;
             mp=my*map.getMapX()+mx;
-            if((mp>=0 && mp<64) && (map.getMap()[mp]>=1)){
+            if((mp>=0 && mp<map.getMapSize()) && (map.getMap()[mp]>=1)){
                 dof=8;
                 hx=rx;
                 hy=ry;
@@ -220,7 +220,7 @@ void Raycast::drawRays3D(Player& player, Map& map){
         distH=horizontalIntersection(player,map, mx, my, mp, dof,  rx,  ry,  ra,  xo,  yo, hx, hy, textureTypeH);
         distV=verticalIntersection(player,map, mx, my, mp, dof,  rx,  ry,  ra,  xo,  yo, vx, vy, textureTypeV);
         if(distH<distV){
-            DrawLine(player.getPos()->getPosX()*Game::miniMapScale+Game::miniMapOffset, player.getPos()->getPosY()*Game::miniMapScale+Game::miniMapOffset, hx*Game::miniMapScale+Game::miniMapOffset, hy*Game::miniMapScale+Game::miniMapOffset, GREEN);
+            DrawLine(player.getPos()->getPosX()*Game::miniMapScale+Game::miniMapOffset, player.getPos()->getPosY()*Game::miniMapScale+Game::miniMapOffset, hx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, hy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
             distR=distH;
             rx=hx;
             ry=hy;
@@ -228,7 +228,7 @@ void Raycast::drawRays3D(Player& player, Map& map){
             wallColor=colorH;
             shade=100;
         }else{
-            DrawLine(player.getPos()->getPosX()*Game::miniMapScale+Game::miniMapOffset, player.getPos()->getPosY()*Game::miniMapScale+Game::miniMapOffset, vx*Game::miniMapScale+Game::miniMapOffset, vy*Game::miniMapScale+Game::miniMapOffset, GREEN);
+            DrawLine(player.getPos()->getPosX()*Game::miniMapScale+Game::miniMapOffset, player.getPos()->getPosY()*Game::miniMapScale+Game::miniMapOffset, vx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, vy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
             distR=distV;
             rx=vx;
             ry=vy;
@@ -282,13 +282,14 @@ void Raycast::drawRays3D(Player& player, Map& map){
         //--
 
         textureY+=textureType*32;
+        int darkness=(textureType==1)?-32:0;
         Color color;
         for (int y=0 ;y<lineHeight;y++) {
             int pixel = ((int)textureY*32+(int)textureX)*3;
             int red = textures[pixel];
             int green = textures[pixel+1];
             int blue = textures[pixel+2];
-            color = Color{static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),255};
+            color = Color{static_cast<unsigned char>(red+darkness),static_cast<unsigned char>(green+darkness),static_cast<unsigned char>(blue+darkness),255};
             //color=wallColor;
             DrawLineEx(Vector2{(float)r*8, (float)lineOffset+y-1},Vector2{(float)r*8,(float)lineOffset+y} , 8, color);
 

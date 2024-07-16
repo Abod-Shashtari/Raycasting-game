@@ -15,7 +15,7 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        game->update();
+        game->update(GetFrameTime());
         game->render();
         /*
         int currentFPS = GetFPS();

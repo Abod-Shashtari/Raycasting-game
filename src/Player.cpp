@@ -60,7 +60,7 @@ void collide(Vector2D& pos, DeltaAngle& deltaAngle, Map& map, int offset, int di
     }
 
 }
-void Player::update(Map& map,std::vector<GameObject> &enemies){
+void Player::update(Map& map,std::vector<GameObject> &enemies,int& score){
     if(IsKeyDown(KEY_W)){
         dir[0]={0};dir[1]={0};dir[2]={0};dir[3]={0};
         collide(*pos, *deltaAngle, map, 10, dir);
@@ -119,6 +119,7 @@ void Player::update(Map& map,std::vector<GameObject> &enemies){
 
             if(abs(playerDeg-enemyAngle)<=15) {
                 std::cout<<"KILLED"<<std::endl;
+                score++;
                 enemies.erase(enemies.begin()+index);
                 break;
             }
@@ -154,8 +155,9 @@ void drawHand(){
 void Player::render(Map& map){
     int width=4;
     int height=4;
+    int offset=5;
     DrawLine(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset, (pos->getPosX()+deltaAngle->dx)*Game::miniMapScale+Game::miniMapOffset,(pos->getPosY()+deltaAngle->dy)*Game::miniMapScale+Game::miniMapOffset, RED);
-    DrawRectangle(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset, width, height, RED); 
+    DrawRectangle(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset-offset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset-offset, width, height, RED); 
     drawHand();
 }
 

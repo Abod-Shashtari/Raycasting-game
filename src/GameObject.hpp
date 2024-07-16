@@ -4,10 +4,10 @@
 class GameObject{
     private:
     public:
-        float speed=0.5;
+        float speed;
         float x,y=0;
         float distnaceFromPlayer;
-        GameObject(float x, float y);
+        GameObject(Vector2D pos,float speed);
         ~GameObject();
         void update(Vector2D playerPos,Map &map);
         void render();
