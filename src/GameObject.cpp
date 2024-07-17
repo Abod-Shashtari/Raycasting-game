@@ -1,6 +1,8 @@
 #include "GameObject.hpp"
 #include "Constants.hpp"
 #include "Vector2D.hpp"
+#include <cmath>
+#include <iostream>
 
 GameObject::GameObject(Vector2D pos,float speed){
     this->x=pos.getPosX();
@@ -8,7 +10,7 @@ GameObject::GameObject(Vector2D pos,float speed){
     this->speed=speed;
 }
 int offset=10;
-void GameObject::update(Vector2D playerPos,Map &map){
+bool GameObject::update(Vector2D playerPos,Map &map){
     if(playerPos.getPosX()>x){
         int newX,newY;
         newX=(x+offset)/WALL_SIZE;
@@ -45,6 +47,8 @@ void GameObject::update(Vector2D playerPos,Map &map){
         if(mapPos>0 && mapPos<map.getMapSize() && (map.getMap()[mapPos]==0))
             y-=speed;
     }
+    float distance = sqrt(pow(playerPos.getPosX()-x,2)+pow(playerPos.getPosY()-y,2));
+    return (distance<25);
 }
 void GameObject::render(){
 }

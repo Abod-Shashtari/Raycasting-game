@@ -9,6 +9,6 @@ class GameObject{
         float distnaceFromPlayer;
         GameObject(Vector2D pos,float speed);
         ~GameObject();
-        void update(Vector2D playerPos,Map &map);
+        bool update(Vector2D playerPos,Map &map);
         void render();
 };

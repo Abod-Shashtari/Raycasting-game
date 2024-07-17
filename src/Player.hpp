@@ -17,7 +17,7 @@ class Player{
         Player(float x, float y,int speed);
         ~Player();
         void update(Map& map,std::vector<GameObject> &enemies,int& score);
-        void render(Map& map);
+        void render(Map& map,float deltaTime);
         Vector2D* getPos();
         DeltaAngle* getDeltaAngle();
 };

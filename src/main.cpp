@@ -16,7 +16,7 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         game->update(GetFrameTime());
-        game->render();
+        game->render(GetFrameTime());
         /*
         int currentFPS = GetFPS();
         std::cout<<currentFPS<<std::endl;

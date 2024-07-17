@@ -5,9 +5,12 @@
 #include <iostream>
 #include <vector>
 #include "../assets/playerText.ppm"
+#include "../assets/fireText.ppm"
 
 int dir[4]={0};
 int doorDir[4]={0};
+float fireSpriteTime=0;
+float const fireSpriteDuration=0.1;
 Player::Player(float x, float y,int speed){
     this->speed=speed;
     pos=new Vector2D(x,y);
@@ -61,7 +64,7 @@ void collide(Vector2D& pos, DeltaAngle& deltaAngle, Map& map, int offset, int di
 
 }
 void Player::update(Map& map,std::vector<GameObject> &enemies,int& score){
-    if(IsKeyDown(KEY_W)){
+    if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)){
         dir[0]={0};dir[1]={0};dir[2]={0};dir[3]={0};
         collide(*pos, *deltaAngle, map, 10, dir);
 
@@ -72,13 +75,13 @@ void Player::update(Map& map,std::vector<GameObject> &enemies,int& score){
             pos->setPosY(pos->getPosY()+deltaAngle->dy);
 
     }
-    if(IsKeyDown(KEY_A)){
+    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)){
         deltaAngle->angle-=0.06;
         if(deltaAngle->angle<0) deltaAngle->angle+=2*PI;
         deltaAngle->dx=cos(deltaAngle->angle)*speed;
         deltaAngle->dy=sin(deltaAngle->angle)*speed;
     }
-    if(IsKeyDown(KEY_S)){
+    if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)){
         dir[0]={0};dir[1]={0};dir[2]={0};dir[3]={0};
         collide(*pos, *deltaAngle, map, 10, dir);
 
@@ -88,7 +91,7 @@ void Player::update(Map& map,std::vector<GameObject> &enemies,int& score){
         if(dir[3]==0)
             pos->setPosY(pos->getPosY()-deltaAngle->dy);
     }
-    if(IsKeyDown(KEY_D)){
+    if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)){
         deltaAngle->angle+=0.06;
         if(deltaAngle->angle>2*PI) deltaAngle->angle-=2*PI;
         deltaAngle->dx=cos(deltaAngle->angle)*speed;
@@ -107,6 +110,7 @@ void Player::update(Map& map,std::vector<GameObject> &enemies,int& score){
     //shoot
     if(IsKeyPressed(KEY_LEFT_CONTROL)){
         PlaySound(gunShotWav);
+        fireSpriteTime=fireSpriteDuration;
         float playerDeg=(this->getDeltaAngle()->angle)*RAD2DEG;
         int index=0;
         for(GameObject e : enemies){
@@ -152,12 +156,35 @@ void drawHand(){
         }
     }
 }
-void Player::render(Map& map){
+void drawFire(){
+    int offsetX=590;
+    int offsetY=370;
+    int reslution=2;
+    int scale=4;
+    int scaledSize=32*scale;
+    for(int i=0;i<scaledSize;i+=reslution){
+        for(int j=0;j<scaledSize;j+=reslution){
+                int pixel = ((i/scale)*32+(j/scale))*3;
+                int red = fireText[pixel];
+                int green = fireText[pixel + 1];
+                int blue = fireText[pixel + 2];
+
+                int alpha =(red==255 && green ==0 && blue==255)?0:255;
+                Color color={static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),static_cast<unsigned char>(alpha)};
+                Vector2 v1={static_cast<float>(j+offsetX-scaledSize/2.0),static_cast<float>(i+offsetY-scaledSize/2.0)};
+                Vector2 v2={static_cast<float>(j+offsetX-scaledSize/2.0),static_cast<float>(i+offsetY+reslution-scaledSize/2.0)};
+                DrawLineEx(v1, v2, reslution, color);
+        }
+    }
+}
+void Player::render(Map& map,float deltaTime){
     int width=4;
     int height=4;
     int offset=5;
     DrawLine(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset, (pos->getPosX()+deltaAngle->dx)*Game::miniMapScale+Game::miniMapOffset,(pos->getPosY()+deltaAngle->dy)*Game::miniMapScale+Game::miniMapOffset, RED);
     DrawRectangle(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset-offset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset-offset, width, height, RED); 
+    fireSpriteTime=(fireSpriteTime>0)?(fireSpriteTime-deltaTime):(0);
+    if(fireSpriteTime>0) drawFire();
     drawHand();
 }
 

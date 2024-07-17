@@ -157,7 +157,7 @@ void Raycast::drawSprite(Player& player, std::vector<GameObject> eneimes){
 
         //scale = sprite height = sprite width
         float scale=DISTANCE_TO_PROJ/(distanceToSprite);
-        if (scale>10) scale=10;
+        if (scale>20) scale=20;
         float scaledSize=SPRITE_SIZE*scale;
 
         int resolution=2;
