@@ -12,12 +12,12 @@
 TitleScreen* titleScreen;
 Player* player;
 std::vector<GameObject> enemies;
-float spawnTimeMax=1.0;
-float spawnTimeMin=0.5;
+float spawnTimeMax=1.8;
+float spawnTimeMin=1.7;
 float spwanTimer=0;
 std::random_device rd;
 std::uniform_int_distribution<int> dist(0,3);
-std::uniform_real_distribution<float> distTime(1.5,2);
+std::uniform_real_distribution<float> distTime(spawnTimeMin,spawnTimeMax);
 
 Font font;
 int score=0;
@@ -27,15 +27,19 @@ Map myMap;
 bool gameStarted=false;
 
 bool test=false;
+//int count=0;
 void generateEnemies(std::vector<GameObject> &enemies,float deltaTime){
     //alien position
     int randPos=dist(rd);
     //alien spawn
     spwanTimer-=deltaTime;
     if(spwanTimer<=0 && test==false){
-        enemies.push_back(*new GameObject(SPWANING_POS[randPos], 1));
+        enemies.push_back(*new GameObject(SPWANING_POS[randPos], 1.5));
         spwanTimer=distTime(rd);
-        //test=true;
+            //count++;
+        //if(count>2){
+            //test=true;
+        //}
     }
 
 }
@@ -48,7 +52,7 @@ void Game::init(char* title,int width,int height){
 }
 void Game::update(float deltaTime){
     if(!gameStarted){
-        gameStarted=titleScreen->update();
+        gameStarted=titleScreen->update(enemies,*player,score);
     }
     if(!dead){
         if (gameStarted){
@@ -60,14 +64,16 @@ void Game::update(float deltaTime){
             }
         }
     }else{
-        gameStarted=false;
+        dead=!(titleScreen->update(enemies,*player,score));
     }
 }
 void Game::render(float deltaTime){
     BeginDrawing();
     ClearBackground(DARKGRAY);
 
-    if(gameStarted){
+    if(!gameStarted || dead){
+        titleScreen->render(dead,score);
+    }else{
         raycast->drawRays3D(*player, myMap);
         myMap.render();
         raycast->drawSprite(*player,enemies);
@@ -75,15 +81,12 @@ void Game::render(float deltaTime){
 
         //drawObjectOnMap
         for(GameObject e : enemies){
-            DrawRectangle(e.x*Game::miniMapScale+Game::miniMapOffset, e.y*Game::miniMapScale+Game::miniMapOffset, 2, 2, WHITE); 
+            DrawRectangle(e.x*Game::miniMapScale+Game::miniMapOffset-Game::miniMapPlayerOffset, e.y*Game::miniMapScale+Game::miniMapOffset-Game::miniMapPlayerOffset, 2, 2, WHITE); 
         }
 
         //Draw Score
         DrawTextEx(font,TextFormat("SCORE: %d", score), Vector2{static_cast<float>(WINDOW_WIDTH-160),20}, font.baseSize*2.0f, 2, WHITE);
 
-    }else if(!gameStarted || dead){
-        titleScreen->render(dead);
     }
-
     EndDrawing();
 }

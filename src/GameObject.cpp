@@ -2,7 +2,6 @@
 #include "Constants.hpp"
 #include "Vector2D.hpp"
 #include <cmath>
-#include <iostream>
 
 GameObject::GameObject(Vector2D pos,float speed){
     this->x=pos.getPosX();
@@ -48,7 +47,7 @@ bool GameObject::update(Vector2D playerPos,Map &map){
             y-=speed;
     }
     float distance = sqrt(pow(playerPos.getPosX()-x,2)+pow(playerPos.getPosY()-y,2));
-    return (distance<25);
+    return (distance<30);
 }
 void GameObject::render(){
 }

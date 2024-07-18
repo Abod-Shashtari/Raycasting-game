@@ -24,7 +24,7 @@ class Raycast{
         float distances[120];
     public:
         void drawRays3D(Player& player, Map& map);
-        void drawSprite(Player& player, std::vector<GameObject> enemmies);
+        void drawSprite(Player& player, std::vector<GameObject> &enemies);
         float horizontalIntersection(Player& player,Map& map, int mx,int my,int mp,int dof,float rx,float ry,float ra,float xo,float yo, float& hx,float& hy, int& textureTypeH);
         float verticalIntersection(Player& player, Map& map, int mx,int my,int mp,int dof,float rx,float ry,float ra,float xo,float yo, float& vx,float& vy, int& textureTypeV);
 };

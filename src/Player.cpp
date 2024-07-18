@@ -13,9 +13,10 @@ float fireSpriteTime=0;
 float const fireSpriteDuration=0.1;
 Player::Player(float x, float y,int speed){
     this->speed=speed;
-    pos=new Vector2D(x,y);
-    pdx=cos(pa)*speed;
-    pdy=sin(pa)*speed;
+    pos=new Vector2D(100,200);
+    float pa=PI/2.0;
+    float pdx=cos(pa)*speed;
+    float pdy=sin(pa)*speed;
     deltaAngle= new DeltaAngle(pdx,pdy,pa);
     InitAudioDevice();
     gunShotWav=LoadSound("../assets/gunshot.wav");
@@ -121,8 +122,7 @@ void Player::update(Map& map,std::vector<GameObject> &enemies,int& score){
             if(enemyAngle>360)enemyAngle-=360;
             if(enemyAngle<0)enemyAngle+=360;
 
-            if(abs(playerDeg-enemyAngle)<=15) {
-                std::cout<<"KILLED"<<std::endl;
+            if(abs(playerDeg-enemyAngle)<=12 && e.seen) {
                 score++;
                 enemies.erase(enemies.begin()+index);
                 break;
@@ -180,9 +180,10 @@ void drawFire(){
 void Player::render(Map& map,float deltaTime){
     int width=4;
     int height=4;
-    int offset=5;
+    float drawPosX=pos->getPosX()*Game::miniMapScale+Game::miniMapOffset-Game::miniMapPlayerOffset;
+    float drawPosY=pos->getPosY()*Game::miniMapScale+Game::miniMapOffset-Game::miniMapPlayerOffset;
     DrawLine(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset, (pos->getPosX()+deltaAngle->dx)*Game::miniMapScale+Game::miniMapOffset,(pos->getPosY()+deltaAngle->dy)*Game::miniMapScale+Game::miniMapOffset, RED);
-    DrawRectangle(pos->getPosX()*Game::miniMapScale+Game::miniMapOffset-offset, pos->getPosY()*Game::miniMapScale+Game::miniMapOffset-offset, width, height, RED); 
+    DrawRectangle(drawPosX, drawPosY, width, height, RED); 
     fireSpriteTime=(fireSpriteTime>0)?(fireSpriteTime-deltaTime):(0);
     if(fireSpriteTime>0) drawFire();
     drawHand();

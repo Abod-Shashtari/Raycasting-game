@@ -112,7 +112,7 @@ void printDist(std::vector<GameObject> eneimes){
     std::cout<<"====="<<std::endl;
 
 }
-void Raycast::drawSprite(Player& player, std::vector<GameObject> eneimes){
+void Raycast::drawSprite(Player& player, std::vector<GameObject> &eneimes){
     //sort eneimes by distance from player
     for(GameObject &s : eneimes){
         float hx=s.x-player.getPos()->getPosX();
@@ -128,7 +128,7 @@ void Raycast::drawSprite(Player& player, std::vector<GameObject> eneimes){
         }
     }
 
-    for(GameObject s : eneimes){
+    for(GameObject &s : eneimes){
         float hx=s.x-player.getPos()->getPosX();
         float hy=s.y-player.getPos()->getPosY();
 
@@ -161,10 +161,30 @@ void Raycast::drawSprite(Player& player, std::vector<GameObject> eneimes){
         float scaledSize=SPRITE_SIZE*scale;
 
         int resolution=2;
+        int notSeenCount=0;
+        int outX=0;
         for (int x=0; x<scaledSize; x+=resolution) {
+            outX=x;
             // Check if sprite is behind a wall
             int screenX = (x + spriteScreenX - (scaledSize / 2));
-            if (distances[(int) screenX * 120 / WINDOW_WIDTH] < distanceToSprite) continue;
+
+            int index=(int) screenX * 120 / WINDOW_WIDTH;
+
+            if (distances[index] < distanceToSprite) {
+                notSeenCount+=resolution;
+                if((x+resolution)>=(scaledSize) && notSeenCount>=x){
+                    s.seen=false;
+                }
+                continue;
+            }
+
+            if(index<120){
+                s.seen=true;
+                //std::cout<<"wall dist: "<<distances[index]<<std::endl;
+                //std::cout<<"sprite dist: "<<distanceToSprite<<std::endl;
+                //std::cout<<"inedx: "<<index<<std::endl;
+            }
+
 
             for (int y=0; y<scaledSize; y+=resolution) {
                 int screenY = (y +spriteScreenY- (scaledSize / 2));
@@ -185,6 +205,9 @@ void Raycast::drawSprite(Player& player, std::vector<GameObject> eneimes){
             }
 
         }
+            //std::cout<<"==="<<s.seen<<std::endl;
+            //std::cout<<"notSeenCount: "<<notSeenCount<<std::endl;
+            //std::cout<<"outX: "<<outX<<std::endl;
     }
 
 }
@@ -219,8 +242,10 @@ void Raycast::drawRays3D(Player& player, Map& map){
         dof=0;
         distH=horizontalIntersection(player,map, mx, my, mp, dof,  rx,  ry,  ra,  xo,  yo, hx, hy, textureTypeH);
         distV=verticalIntersection(player,map, mx, my, mp, dof,  rx,  ry,  ra,  xo,  yo, vx, vy, textureTypeV);
+        float MiniMapPlayerPosX=(player.getPos()->getPosX())*Game::miniMapScale+Game::miniMapOffset-Game::miniMapPlayerOffset;
+        float MiniMapPlayerPosY=(player.getPos()->getPosY())*Game::miniMapScale+Game::miniMapOffset-Game::miniMapPlayerOffset;
         if(distH<distV){
-            DrawLine(player.getPos()->getPosX()*Game::miniMapScale+Game::miniMapOffset, player.getPos()->getPosY()*Game::miniMapScale+Game::miniMapOffset, hx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, hy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
+            DrawLine(MiniMapPlayerPosX,MiniMapPlayerPosY, hx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, hy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
             distR=distH;
             rx=hx;
             ry=hy;
@@ -228,7 +253,7 @@ void Raycast::drawRays3D(Player& player, Map& map){
             wallColor=colorH;
             shade=100;
         }else{
-            DrawLine(player.getPos()->getPosX()*Game::miniMapScale+Game::miniMapOffset, player.getPos()->getPosY()*Game::miniMapScale+Game::miniMapOffset, vx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, vy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
+            DrawLine(MiniMapPlayerPosX, MiniMapPlayerPosY, vx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, vy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
             distR=distV;
             rx=vx;
             ry=vy;

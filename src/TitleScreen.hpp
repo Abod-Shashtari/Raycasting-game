@@ -1,3 +1,5 @@
+#include "GameObject.hpp"
+#include "Player.hpp"
 #include "raylib.h"
 class TitleScreen{
     private:
@@ -8,6 +10,6 @@ class TitleScreen{
         char const * gameOverText;
     public:
         TitleScreen();
-        bool update();
-        void render(bool dead);
+        bool update(std::vector<GameObject>& eneimes,Player &player,int& score );
+        void render(bool dead,int score);
 };

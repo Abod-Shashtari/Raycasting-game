@@ -6,6 +6,7 @@ class GameObject{
     public:
         float speed;
         float x,y=0;
+        bool seen=false;
         float distnaceFromPlayer;
         GameObject(Vector2D pos,float speed);
         ~GameObject();
