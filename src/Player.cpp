@@ -2,7 +2,6 @@
 #include "Game.hpp"
 #include "raylib.h"
 #include <cmath>
-#include <iostream>
 #include <vector>
 #include "../assets/playerText.ppm"
 #include "../assets/fireText.ppm"

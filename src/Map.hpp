@@ -151,6 +151,7 @@ static const int All_Textures[]={
 class Map{
     private:
         int* map;
+        int* mapF;
         int mapX;
         int mapY;
         int mapSize;
@@ -164,5 +165,6 @@ class Map{
         int getMapY();
         int getMapSize();
         int* getMap();
+        int* getMapF();
         ~Map();
 };

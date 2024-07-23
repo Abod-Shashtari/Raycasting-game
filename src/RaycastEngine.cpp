@@ -3,8 +3,10 @@
 #include "Map.hpp"
 #include "raylib.h"
 
-#include "../assets/textures.ppm"
+#include "../assets/textures64.ppm"
+#include "../assets/textures32.ppm"
 #include "../assets/alien.ppm"
+#include "../assets/wall64.ppm"
 #include "Constants.hpp"
 #include <algorithm>
 #include <cmath>
@@ -44,14 +46,14 @@ float Raycast::verticalIntersection(Player& player,Map& map,int mx,int my,int mp
         if(ra==P3 || ra==P2){
             ry=player.getPos()->getPosY();
             rx=player.getPos()->getPosX();
-            dof=8;
+            dof=10;
         }
-        while(dof<8){
+        while(dof<10){
             mx=(int)rx>>6;
             my=(int)ry>>6;
             mp=my*map.getMapX()+mx;
             if((mp>=0 && mp<map.getMapSize()) && (map.getMap()[mp]>=1)){
-                dof=8;
+                dof=10;
                 vx=rx;
                 vy=ry;
                 textureTypeV=map.getMap()[mp]-1;
@@ -82,14 +84,14 @@ float Raycast::horizontalIntersection(Player& player, Map& map, int mx,int my,in
         if(ra==0 || ra==(2*PI) || ra==PI){
             ry=player.getPos()->getPosY();
             rx=player.getPos()->getPosX();
-            dof=8;
+            dof=10;
         }
-        while(dof<8){
+        while(dof<10){
             mx=(int)rx>>6;
             my=(int)ry>>6;
             mp=my*map.getMapX()+mx;
             if((mp>=0 && mp<map.getMapSize()) && (map.getMap()[mp]>=1)){
-                dof=8;
+                dof=10;
                 hx=rx;
                 hy=ry;
                 textureTypeH=map.getMap()[mp]-1;
@@ -180,9 +182,6 @@ void Raycast::drawSprite(Player& player, std::vector<GameObject> &eneimes){
 
             if(index<120){
                 s.seen=true;
-                //std::cout<<"wall dist: "<<distances[index]<<std::endl;
-                //std::cout<<"sprite dist: "<<distanceToSprite<<std::endl;
-                //std::cout<<"inedx: "<<index<<std::endl;
             }
 
 
@@ -205,9 +204,6 @@ void Raycast::drawSprite(Player& player, std::vector<GameObject> &eneimes){
             }
 
         }
-            //std::cout<<"==="<<s.seen<<std::endl;
-            //std::cout<<"notSeenCount: "<<notSeenCount<<std::endl;
-            //std::cout<<"outX: "<<outX<<std::endl;
     }
 
 }
@@ -311,9 +307,9 @@ void Raycast::drawRays3D(Player& player, Map& map){
         Color color;
         for (int y=0 ;y<lineHeight;y++) {
             int pixel = ((int)textureY*32+(int)textureX)*3;
-            int red = textures[pixel];
-            int green = textures[pixel+1];
-            int blue = textures[pixel+2];
+            int red = textures32[pixel];
+            int green = textures32[pixel+1];
+            int blue = textures32[pixel+2];
             color = Color{static_cast<unsigned char>(red+darkness),static_cast<unsigned char>(green+darkness),static_cast<unsigned char>(blue+darkness),255};
             //color=wallColor;
             DrawLineEx(Vector2{(float)r*8, (float)lineOffset+y-1},Vector2{(float)r*8,(float)lineOffset+y} , 8, color);
@@ -325,35 +321,43 @@ void Raycast::drawRays3D(Player& player, Map& map){
             float dy=y-(WINDOW_HEIGHT/2.0);
             float beta=(player.getDeltaAngle()->angle-ra);
             float raFix=cos(FixAng(beta));//fix
-            //textureX=player.getPos()->getPosX()/2.0 + cos(ra)*158*32*2/dy/raFix;
-            //textureY=player.getPos()->getPosY()/2.0 + sin(ra)*158*32*2/dy/raFix;
             //floor-----
-            float s=32*DISTANCE_TO_PROJ/dy;
+            float s=PLAYER_HEIGHT*DISTANCE_TO_PROJ/(dy);
             float d=s/raFix;
             textureX=player.getPos()->getPosX()+cos(ra)*d;
             textureY=player.getPos()->getPosY()+sin(ra)*d;
-            int floorTextureType=2*32*32;
-            int pixel = (((int)(textureY)&31)*32 + ((int)(textureX) &31))*3+floorTextureType*3;
-            int red = textures[pixel];
-            int green = textures[pixel+1];
-            int blue = textures[pixel+2];
+            int index=((int)(textureY/64.0)*map.getMapX()+(int)(textureX/64.0));
+
+            int mp=map.getMapF()[index];
+            int floorTextureType = mp * 32 * 32; // Use 32x32 textures
+
+            // Adjust texture coordinates for 32x32 textures and scale to 64x64
+            int scaledTextureX = ((int)(textureX / 2) & 31); // Divide by 2 to fit into 32x32 texture
+            int scaledTextureY = ((int)(textureY / 2) & 31); // Divide by 2 to fit into 32x32 texture
+
+            int pixel = (scaledTextureY * 32 + scaledTextureX) * 3 + floorTextureType * 3;
+            int red = textures32[pixel];
+            int green = textures32[pixel+1];
+            int blue = textures32[pixel+2];
+            /*
+            int floorTextureType=(mp)*64*64;
+            int pixel = (((int)(textureY)&63)*64 + ((int)(textureX) &63))*3+floorTextureType*3;
+            int red = textures64[pixel];
+            int green = textures64[pixel+1];
+            int blue = textures64[pixel+2];
+            */
             color = Color{static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),255};
 
             DrawLineEx(Vector2{(float)(r*8),(float)(y-1)},Vector2{(float)r*8,(float)y} , 8, color);
 
-            //DrawLineEx(Vector2{(float)(textureX),(float)(y)},Vector2{(float)textureX,(float)y+8} , 8, color);
-            //DrawLineEx(Vector2{(float)(textureX),(float)(y-1)},Vector2{(float)textureX,(float)y} , 8, color);
-            //DrawLineEx(Vector2{(float)(textureX)*8,(float)(y-1)},Vector2{(float)textureX*8,(float)y} , 8, color);
-
             //ceiling-----
-            int ceilingTextureType=3*32*32;
-            pixel = (((int)(textureY)&31)*32 + ((int)(textureX) &31))*3+ceilingTextureType*3;
-            red = textures[pixel];
-            green = textures[pixel+1];
-            blue = textures[pixel+2];
+            int ceilingTextureType=3*64*64;
+            pixel = (((int)(textureY)&63)*64 + ((int)(textureX) &63))*3+ceilingTextureType*3;
+            red = textures64[pixel];
+            green = textures64[pixel+1];
+            blue = textures64[pixel+2];
             color = Color{static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),255};
 
-            //DrawLineEx(Vector2{(float)WINDOW_WIDTH+(r*8),(float)(WINDOW_HEIGHT-(y-1))},Vector2{(float)r*8,(float)(WINDOW_HEIGHT-y)} , 8, color);
             DrawLineEx(Vector2{(float)(r*8),(float)(WINDOW_HEIGHT-(y-1))},Vector2{(float)r*8,(float)(WINDOW_HEIGHT-y)} , 8, color);
         }
     }

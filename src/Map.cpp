@@ -9,6 +9,7 @@ Map::Map(){
     mapY=11;
     mapSize=64*Game::miniMapScale;
     map=new int[mapX*mapY];
+    mapF=new int[mapX*mapY];
     /*
     int map0[]={
         1,1,1,1,2,2,2,1,
@@ -49,8 +50,24 @@ Map::Map(){
         0,0,0,0,2,0,2,0,0,0,0,
         0,0,0,0,2,2,2,0,0,0,0,
     };
+    int map0F[]={
+        2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,1,2,2,2,2,2,
+        2,2,2,2,2,2,2,1,2,2,2,
+        2,2,2,2,2,1,2,2,2,2,2,
+        2,2,2,2,2,0,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,
+        2,2,2,2,2,2,2,2,2,2,2,
+    };
     for(int i=0;i<getMapSize();++i){
         map[i]=map0[i];
+    }
+    for(int i=0;i<getMapSize();++i){
+        mapF[i]=map0F[i];
     }
 }
 Map::~Map(){
@@ -74,6 +91,9 @@ void Map::render(){
 
 int* Map::getMap(){
     return map;
+}
+int* Map::getMapF(){
+    return mapF;
 }
 int Map::getMapX(){
     return mapX;
