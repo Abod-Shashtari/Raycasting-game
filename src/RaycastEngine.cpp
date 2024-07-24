@@ -3,14 +3,11 @@
 #include "Map.hpp"
 #include "raylib.h"
 
-#include "../assets/textures64.ppm"
 #include "../assets/textures32.ppm"
 #include "../assets/alien.ppm"
-#include "../assets/wall64.ppm"
 #include "Constants.hpp"
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <vector>
 //--------
 
@@ -103,16 +100,6 @@ float Raycast::horizontalIntersection(Player& player, Map& map, int mx,int my,in
             }
         }
         return INFINITY;
-}
-void printDist(std::vector<GameObject> eneimes){
-    std::cout<<"====="<<std::endl;
-    int i=0;
-    for(GameObject &s : eneimes){
-        ++i;
-        std::cout<<i<<": "<<s.distnaceFromPlayer<<std::endl;
-    }
-    std::cout<<"====="<<std::endl;
-
 }
 void Raycast::drawSprite(Player& player, std::vector<GameObject> &eneimes){
     //sort eneimes by distance from player
@@ -228,7 +215,7 @@ void Raycast::drawRays3D(Player& player, Map& map){
     int textureTypeV=0;
     int textureType=0;
 
-    int shade=0;
+    bool isHorizontal;
 
     //D1*30 means 30 deg which is the furthest ray from the player 
     ra=FixAng(player.getDeltaAngle()->angle-D1*30);
@@ -247,7 +234,7 @@ void Raycast::drawRays3D(Player& player, Map& map){
             ry=hy;
             textureType=textureTypeH;
             wallColor=colorH;
-            shade=100;
+            isHorizontal=true;
         }else{
             DrawLine(MiniMapPlayerPosX, MiniMapPlayerPosY, vx*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, vy*Game::miniMapScale+Game::miniMapOffset+Game::miniMapRayOffset, GREEN);
             distR=distV;
@@ -255,7 +242,7 @@ void Raycast::drawRays3D(Player& player, Map& map){
             ry=vy;
             textureType=textureTypeV;
             wallColor=colorV;
-            shade=0;
+            isHorizontal=false;
         }
         ra+=DEG_PER_COLUMN*DEG2RAD;
         if(ra<0) ra+=PI*2;
@@ -284,23 +271,26 @@ void Raycast::drawRays3D(Player& player, Map& map){
 
         float textureY=textureYOffset*textureYStep;
         float textureX;
-        //TODO: understand this code.
-        //--
-        if(shade==100){
+
+        /*
+         *this code is for:
+         *1.scaling
+         *2.flip the texture to map the texture correctly based on player direction
+         */
+        if(isHorizontal){
             //horizontal
-            textureX=((int)(rx/2.0))%(32);
+            textureX=((int)(rx/2.0))%(32);//scale 32x32 textures into 64x64 space
             if(player.getDeltaAngle()->angle>0 && player.getDeltaAngle()->angle<PI){
-                textureX=31-textureX;
+                textureX=31-textureX;//flip the texture horizontally
             }
 
         }else{
             //vertical
-            textureX=((int)(ry/2.0))%(32);
+            textureX=((int)(ry/2.0))%(32);//scale 32x32 textures into 64x64 space
             if(player.getDeltaAngle()->angle>P2 && player.getDeltaAngle()->angle<P3){
-                textureX=31-textureX;
+                textureX=31-textureX;//flip the texture vertically
             }
         }
-        //--
 
         textureY+=textureType*32;
         int darkness=(textureType==1)?-32:0;
@@ -311,7 +301,6 @@ void Raycast::drawRays3D(Player& player, Map& map){
             int green = textures32[pixel+1];
             int blue = textures32[pixel+2];
             color = Color{static_cast<unsigned char>(red+darkness),static_cast<unsigned char>(green+darkness),static_cast<unsigned char>(blue+darkness),255};
-            //color=wallColor;
             DrawLineEx(Vector2{(float)r*8, (float)lineOffset+y-1},Vector2{(float)r*8,(float)lineOffset+y} , 8, color);
 
             textureY+=textureYStep;
@@ -331,31 +320,25 @@ void Raycast::drawRays3D(Player& player, Map& map){
             int mp=map.getMapF()[index];
             int floorTextureType = mp * 32 * 32; // Use 32x32 textures
 
-            // Adjust texture coordinates for 32x32 textures and scale to 64x64
-            int scaledTextureX = ((int)(textureX / 2) & 31); // Divide by 2 to fit into 32x32 texture
-            int scaledTextureY = ((int)(textureY / 2) & 31); // Divide by 2 to fit into 32x32 texture
+            // scale 32x32 texture into 64x64 space
+            // (&) to make sure the values are from 0 to 31 (32x32 texutre)
+            int scaledTextureX = ((int)(textureX / 2) & 31); 
+            int scaledTextureY = ((int)(textureY / 2) & 31);
 
             int pixel = (scaledTextureY * 32 + scaledTextureX) * 3 + floorTextureType * 3;
             int red = textures32[pixel];
             int green = textures32[pixel+1];
             int blue = textures32[pixel+2];
-            /*
-            int floorTextureType=(mp)*64*64;
-            int pixel = (((int)(textureY)&63)*64 + ((int)(textureX) &63))*3+floorTextureType*3;
-            int red = textures64[pixel];
-            int green = textures64[pixel+1];
-            int blue = textures64[pixel+2];
-            */
             color = Color{static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),255};
 
             DrawLineEx(Vector2{(float)(r*8),(float)(y-1)},Vector2{(float)r*8,(float)y} , 8, color);
 
             //ceiling-----
-            int ceilingTextureType=3*64*64;
-            pixel = (((int)(textureY)&63)*64 + ((int)(textureX) &63))*3+ceilingTextureType*3;
-            red = textures64[pixel];
-            green = textures64[pixel+1];
-            blue = textures64[pixel+2];
+            int ceilingTextureType=3*32*32; // (3) is the ceiling texture
+            pixel = (((int)(textureY)&31)*32 + ((int)(textureX) &31))*3+ceilingTextureType*3;
+            red = textures32[pixel];
+            green = textures32[pixel+1];
+            blue = textures32[pixel+2];
             color = Color{static_cast<unsigned char>(red),static_cast<unsigned char>(green),static_cast<unsigned char>(blue),255};
 
             DrawLineEx(Vector2{(float)(r*8),(float)(WINDOW_HEIGHT-(y-1))},Vector2{(float)r*8,(float)(WINDOW_HEIGHT-y)} , 8, color);

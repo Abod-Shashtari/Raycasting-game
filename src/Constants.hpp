@@ -9,4 +9,7 @@ extern const int SPRITE_SIZE;
 extern const int PLAYER_HEIGHT;
 extern const float DEG_PER_COLUMN;//0.0625 // = (FOV/WINDOW_WIDTH)
 extern const int DISTANCE_TO_PROJ; // distance to projection plane = (WINDOW_WIDTH/2)/tan(HALF_FOV)
-extern Vector2D SPWANING_POS[]; // distance to projection plane = (WINDOW_WIDTH/2)/tan(HALF_FOV)
+extern Vector2D SPWANING_POS[];
+extern float ALIEN_SPEED[];
+extern float ALIEN_MIN_SPAWN_TIME[];
+extern float ALIEN_MAX_SPAWN_TIME[];

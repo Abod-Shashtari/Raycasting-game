@@ -22,6 +22,14 @@ Player::Player(float x, float y,int speed){
 }
 Player::~Player(){
 }
+void Player::resetPlayerAngle(){
+    float pa=PI/2.0;
+    float pdx=cos(pa)*speed;
+    float pdy=sin(pa)*speed;
+    deltaAngle->dx=pdx;
+    deltaAngle->dy=pdy;
+    deltaAngle->angle=pa;
+}
 void collide(Vector2D& pos, DeltaAngle& deltaAngle, Map& map, int offset, int dir[]){
     int xOff,yOff; //collision from the front
     int nxOff,nyOff; //collision from the back

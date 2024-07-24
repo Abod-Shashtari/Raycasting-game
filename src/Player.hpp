@@ -9,13 +9,13 @@
 class Player{
     private:
         Vector2D* pos;
-        DeltaAngle* deltaAngle;
-        //float pdx,pdy,pa; //delta x,y,angle calced from cos & sin of angle
+        DeltaAngle* deltaAngle; //delta x,y,angle calculated from cos & sin of angle
         int speed;
         Sound gunShotWav;
     public:
         Player(float x, float y,int speed);
         ~Player();
+        void resetPlayerAngle();
         void update(Map& map,std::vector<GameObject> &enemies,int& score);
         void render(Map& map,float deltaTime);
         Vector2D* getPos();

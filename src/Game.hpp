@@ -6,6 +6,7 @@ class Game{
         constexpr static double miniMapRayOffset=-3;
         constexpr static double miniMapPlayerOffset=5.5;
         bool dead=false;
+        bool pause=false;
         void init(char* title,int width,int height);
         void update(float deltaTime);
         void render(float deltaTime);
