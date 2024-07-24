@@ -62,8 +62,10 @@ void generateEnemies(std::vector<GameObject> &enemies,float deltaTime){
         speed=ALIEN_SPEED[0];
     else if(score>15 && score<25)
         speed=ALIEN_SPEED[1];
-    else if(score>25)
+    else if(score>25 && score<40)
         speed=ALIEN_SPEED[2];
+    else if(score>40)
+        speed=ALIEN_SPEED[3];
 
     if(spwanTimer<=0){
         enemies.push_back(*new GameObject(SPWANING_POS[randPos], 1));
