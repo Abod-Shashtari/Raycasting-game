@@ -1,4 +1,4 @@
----
+ ---
 Raycasting Game (C++/Raylib)
 ---
 
