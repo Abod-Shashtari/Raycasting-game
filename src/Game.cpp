@@ -7,8 +7,9 @@
 #include "Constants.hpp"
 #include "RaycastEngine.hpp"
 #include "TitleScreen.hpp"
-#include <iostream>
+#include <fstream>
 #include <random>
+#include <string>
 #include <vector>
 
 TitleScreen* titleScreen;
@@ -23,7 +24,6 @@ float coolTimer=coolFloorTime;
 float floorTimer=floorTime;
 int playerOldMapPosX;
 int playerOldMapPosY;
-std::vector<Vector2D> hotFloorPos;
 
 std::random_device rd;
 std::uniform_int_distribution<int> dist(0,3);
@@ -37,47 +37,45 @@ Map myMap;
 bool gameStarted=false;
 
 bool test=false;
-//int count=0;
+
+
+int getHighScore(){
+    std::ifstream readFile("../assets/highScore.txt");
+    std::string score;
+    readFile>>score;
+    readFile.close();
+    return std::stoi(score);
+}
+void setHightScore(int score){
+    std::ofstream writeFile("../assets/highScore.txt");
+    writeFile<<score;
+    writeFile.close();
+}
 void generateEnemies(std::vector<GameObject> &enemies,float deltaTime){
     //alien position
     int randPos=dist(rd);
     //alien spawn
     spwanTimer-=deltaTime;
     if(spwanTimer<=0 && test==false){
-        enemies.push_back(*new GameObject(SPWANING_POS[randPos], 1.5));
+        enemies.push_back(*new GameObject(SPWANING_POS[randPos], 1));
         spwanTimer=distTime(rd);
-            //count++;
-        //if(count>2){
-            //test=true;
+        //test=true;
     }
 
 }
-void hotFloor(float deltaTime){
+void hotFloor(float deltaTime, bool& dead){
     int mapPosX=player->getPos()->getPosX()/64.0;
     int mapPosY=player->getPos()->getPosY()/64.0;
     if(mapPosX==playerOldMapPosX && mapPosY==playerOldMapPosY){
         floorTimer-=deltaTime;
         if(floorTimer<=0){
-            myMap.getMapF()[mapPosY*myMap.getMapX()+mapPosX]=5;
-            hotFloorPos.push_back(Vector2D(mapPosX,mapPosY));
+            dead=true;
             floorTimer=floorTime;
         }
     }else{
         floorTimer=floorTime;
         playerOldMapPosX=player->getPos()->getPosX()/64.0;
         playerOldMapPosY=player->getPos()->getPosY()/64.0;
-    }
-}
-void coolFloor(float deltaTime){
-    if(!hotFloorPos.empty()){
-        coolTimer-=deltaTime;
-        if(coolTimer<=0){
-            int mapPosX=hotFloorPos.begin()->getPosX();
-            int mapPosY=hotFloorPos.begin()->getPosY();
-            myMap.getMapF()[mapPosY*myMap.getMapX()+mapPosX]=2;
-            hotFloorPos.erase(hotFloorPos.begin());
-            coolTimer=coolFloorTime;
-        }
     }
 }
 void Game::init(char* title,int width,int height){
@@ -97,16 +95,19 @@ void Game::update(float deltaTime){
         if (gameStarted){
 
             player->update(myMap,enemies,score);
-            hotFloor(deltaTime);
-            coolFloor(deltaTime);
+            hotFloor(deltaTime,dead);
             generateEnemies(enemies, deltaTime);
 
+            if (dead) return;
             for(GameObject &e : enemies){
                 dead=e.update(*player->getPos(),myMap);
                 if (dead) break;
             }
         }
     }else{
+        if(score>getHighScore())
+            setHightScore(score);
+
         dead=!(titleScreen->update(enemies,*player,score));
     }
 }
@@ -115,7 +116,7 @@ void Game::render(float deltaTime){
     ClearBackground(DARKGRAY);
 
     if(!gameStarted || dead){
-        titleScreen->render(dead,score);
+        titleScreen->render(dead,score,getHighScore());
     }else{
         raycast->drawRays3D(*player, myMap);
         myMap.render();

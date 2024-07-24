@@ -25,12 +25,17 @@ bool TitleScreen::update(std::vector<GameObject> &eneimes,Player &player,int &sc
     return false;
 }
 
-void TitleScreen::render(bool dead,int score){
+void TitleScreen::render(bool dead,int score,int highScore){
     ClearBackground(BLACK);
     if(dead){
-        gameOverText=TextFormat("-YOU DIED-\n  score : %d",score);
+        gameOverText=TextFormat("-YOU DIED-");
         gameOverTextSize=MeasureTextEx(titleFont,gameOverText,fontSize, 2);
-        DrawTextEx(titleFont,gameOverText, Vector2{static_cast<float>(WINDOW_WIDTH/2.0-gameOverTextSize.x/2),static_cast<float>(WINDOW_HEIGHT/2.0-gameOverTextSize.y/2)},fontSize, 2, WHITE);
+
+        gameOverScoreText=TextFormat("score : %d\nHigh score : %d",score,highScore);
+        gameOverScoreTextSize=MeasureTextEx(titleFont,gameOverScoreText,fontSize, 2);
+
+        DrawTextEx(titleFont,gameOverText, Vector2{static_cast<float>(WINDOW_WIDTH/2.0-gameOverTextSize.x/2),static_cast<float>(WINDOW_HEIGHT/3.0-gameOverTextSize.y/2)},fontSize, 2, WHITE);
+        DrawTextEx(titleFont,gameOverScoreText, Vector2{static_cast<float>(WINDOW_WIDTH/2.0-gameOverScoreTextSize.x/2),static_cast<float>(WINDOW_HEIGHT*2/3.0-gameOverScoreTextSize.y/2)},fontSize, 2, WHITE);
     }else{
         DrawTextEx(titleFont,titleText, Vector2{static_cast<float>(WINDOW_WIDTH/2.0-titleTextSize.x/2),static_cast<float>(WINDOW_HEIGHT/2.0-titleTextSize.y/2)},fontSize, 2, WHITE);
     }
